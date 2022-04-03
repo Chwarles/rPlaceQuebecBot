@@ -23,6 +23,9 @@ from mappings import color_map, name_map
 
 
 class PlaceClient:
+
+    m_activeAccountCounter = 0
+
     def __init__(self):
         # Data
         self.json_data = self.get_json_data()
@@ -395,12 +398,14 @@ class PlaceClient:
 
                 if time_until_next_draw > 100000:
                     logger.opt(ansi=True).info("<r>Thread #{} :: {}</>", index, "delay is too long will kill this one, bye bye.")
-                    aaa
+                    self.m_activeAccountCounter -= 1
+                    break
 
-                if update_str != new_update_str and time_until_next_draw % 10 == 0:
-                    update_str = new_update_str
+                # if update_str != new_update_str and time_until_next_draw % 10 == 0:
+                update_str = new_update_str
 
-                logger.info("Thread #{} :: {}", index, update_str)
+                if time_until_next_draw <= 10:
+                    logger.info("Thread #{} :: {}", index, update_str)
 
                 # refresh access token if necessary
                 if (
@@ -532,14 +537,23 @@ class PlaceClient:
             if not repeat_forever:
                 break
 
+    def printActiveAccount(self):
+        while True:
+            time.sleep(10)
+            logger.opt(ansi=True).info("<y>There is currently {} active account</>", self.m_activeAccountCounter)
+
     def start(self):
         for index, worker in enumerate(self.json_data["workers"]):
+            
             threading.Thread(
                 target=self.task,
                 args=[index, worker, self.json_data["workers"][worker]],
             ).start()
+            self.m_activeAccountCounter += 1
             # exit(1)
             time.sleep(self.delay_between_launches)
+
+        self.printActiveAccount()
 
 
 @click.command()
