@@ -658,6 +658,7 @@ class PlaceClient:
                         # password is probably invalid
                         logger.exception("Authorization failed!")
                         logger.debug("response: {} - {}", r.status_code, r.text)
+                        self.m_activeAccountCounter -= 1
                         return
                     else:
                         logger.success("Authorization successful!")
