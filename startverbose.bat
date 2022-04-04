@@ -1,3 +1,3 @@
+@echo off
 pip install -r requirements.txt
-py main.py --debug
-pause
+python main.py --debug
